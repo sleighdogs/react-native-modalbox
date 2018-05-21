@@ -65,6 +65,7 @@ var ModalBox = createReactClass({
     easing: PropTypes.func,
     coverScreen: PropTypes.bool,
     keyboardTopOffset: PropTypes.number,
+    fullScreen: PropTypes.bool,
 
     onClosed: PropTypes.func,
     onOpened: PropTypes.func,
@@ -86,7 +87,8 @@ var ModalBox = createReactClass({
       backButtonClose: false,
       easing: Easing.elastic(0.8),
       coverScreen: false,
-      keyboardTopOffset: Platform.OS == 'ios' ? 22 : 0
+      keyboardTopOffset: Platform.OS == 'ios' ? 22 : 0,
+      fullScreen: false
     };
   },
 
@@ -420,10 +422,16 @@ var ModalBox = createReactClass({
     var size    = {height: this.state.containerHeight, width: this.state.containerWidth};
     var offsetX = (this.state.containerWidth - this.state.width) / 2;
 
+    var stylesArray = this.props.fullScreen ? [
+      styles.wrapper, { width: '100%', height: '100%'}, this.props.style, styles.absolute, {transform: [{translateY: this.state.position}, {translateX: offsetX}]}
+    ] :[
+      styles.wrapper, size, this.props.style, {transform: [{translateY: this.state.position}, {translateX: offsetX}]}
+    ]
+
     return (
       <Animated.View
         onLayout={this.onViewLayout}
-        style={[styles.wrapper, size, this.props.style, {transform: [{translateY: this.state.position}, {translateX: offsetX}]} ]}
+        style={stylesArray}
         {...this.state.pan.panHandlers}>
         {this.props.children}
       </Animated.View>
@@ -436,11 +444,13 @@ var ModalBox = createReactClass({
   render: function() {
     var visible = this.state.isOpen || this.state.isAnimateOpen || this.state.isAnimateClose;
 
+    console.log('rendring modal')
+
     if (!visible) return <View/>
 
     var content = (
       <View style={[styles.transparent, styles.absolute]} pointerEvents={'box-none'}>
-        <View style={{ flex: 1 }} pointerEvents={'box-none'} onLayout={this.onContainerLayout}>
+        <View style={this.props.fullScreen ? styles.absolute : { flex: 1 }} pointerEvents={'box-none'} onLayout={this.onContainerLayout}>
           {visible && this.renderBackdrop()}
           {visible && this.renderContent()}
         </View>
