@@ -444,8 +444,6 @@ var ModalBox = createReactClass({
   render: function() {
     var visible = this.state.isOpen || this.state.isAnimateOpen || this.state.isAnimateClose;
 
-    console.log('rendring modal')
-
     if (!visible) return <View/>
 
     var content = (
